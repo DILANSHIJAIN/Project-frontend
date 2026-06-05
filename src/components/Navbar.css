@@ -1,10 +1,106 @@
-.container{
-    max-width: 140rem;
-    padding: 4.2rem  2.4rem ;
-    display: flex;
-    justify-content: space-between;
+header {
+  width: 100%;
+  background-color: #1e3a8a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-ul{
-    display: flex;
-    gap: 3.2 rem;
+
+header .container {
+  max-width: 140rem;
+  margin: 0 auto;
+  padding: 2.5rem 2.4rem; /* Balanced padding */
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* LOGO */
+
+.logo-brand a {
+  font-size: 3.2rem; /* Slightly larger font for the logo */
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
+
+/* NAVBAR */
+
+nav ul {
+  display: flex;
+  gap: 2.5rem; /* Standard gap for regular users */
+  align-items: center;
+  flex-wrap: nowrap; /* Prevent items from wrapping */
+  overflow-x: auto; /* Allow horizontal scrolling if content is too wide */
+  -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+}
+
+nav ul li {
+  list-style: none;
+  white-space: nowrap; /* Prevent text inside links from wrapping */
+}
+
+/* NAV LINKS */
+
+nav ul li a {
+  color: white;
+  font-size: 2rem; /* Larger font size for standard users */
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.3s;
+  position: relative;
+}
+
+/* ADMIN ONLY OVERRIDES */
+/* This class should be applied to the <nav> element when user is admin */
+nav.admin-navigation ul {
+  gap: 1.2rem; /* Tighter gap to save space */
+}
+
+nav.admin-navigation ul li a {
+  font-size: 1.4rem; /* Smaller font for admin to prevent double lines */
+  font-weight: 600;
+}
+
+/* HOVER EFFECT */
+
+nav ul li a:hover {
+  color: #c7d2fe;
+}
+
+/* ACTIVE LINK */
+
+nav ul li a.active {
+  color: #93c5fd;
+}
+
+/* UNDERLINE EFFECT */
+
+nav ul li a::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: -5px;
+  background-color: white;
+  transition: 0.3s;
+}
+
+nav ul li a:hover::after {
+  width: 100%;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 998px) {
+  header .container {
+    flex-direction: column; /* Stack logo and nav vertically */
+    gap: 1.5rem; /* Reduced gap */
+  }
+
+  nav ul {
+    flex-wrap: wrap; /* Allow wrapping on smaller screens for better layout */
+    justify-content: center; /* Center align items when wrapped */
+    gap: 1rem; /* Even smaller gap for wrapped items */
+  }
 }
