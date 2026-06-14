@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../store/auth";
+import { useAuth } from "../store/auth"; // Ensure this path is correct
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const Home = () => {
   const { authorizationToken } = useAuth();
@@ -44,7 +44,7 @@ export const Home = () => {
             <div className="SmartServe">
               <p>{content.heroSubtitle}</p>
 
-              <h1 style={{ whiteSpace: "pre-wrap" }}>
+              <h1>
                 {content.heroTitle}
               </h1>
 
@@ -67,9 +67,8 @@ export const Home = () => {
             <div className="SmartServe">
               <img
                 src={content.homeImage} // Use image from content state
-                alt="Working Together"
-                width="800"
-                height="600"
+                alt="Working Together" // Use image from content state
+                style={{ width: "100%", height: "auto", display: "block" }}
               />
             </div>
 
@@ -106,32 +105,28 @@ export const Home = () => {
         {/* CTA SECTION */}
         <section className="section-hero">
           <div className="container grid grid-two-cols" style={{ textAlign: "left", alignItems: "flex-start" }}>
-
-            <div className="SmartServe">
-              <img
-                src={content.ctaImage}
-                alt="Working Together"
-                width="400"
-                height="500"
-              />
-            </div>
-
-            <div className="SmartServe">
+            {/* Text content for CTA section - order 1 for desktop, top for mobile */}
+            <div className="SmartServe" style={{ order: 1 }}>
               <p>{content.ctaSubtitle}</p>
-
               <h1>{content.ctaTitle}</h1>
-
-              <p style={{ whiteSpace: "pre-wrap" }}>{content.ctaBody}</p>
-
+              <p>{content.ctaBody}</p>
               <div className="btn btn-group">
                 <a href="/contact">
                   <button className="btn">Connect Now</button>
                 </a>
-
                 <a href="/services">
                   <button className="btn secondary-btn">Learn More</button>
                 </a>
               </div>
+            </div>
+
+            {/* Image for CTA section - order 2 for desktop, bottom for mobile */}
+            <div className="SmartServe" style={{ order: 2 }}>
+              <img
+                src={content.ctaImage}
+                alt="Working Together" // Use image from content state
+                style={{ maxWidth: "100%", height: "auto", display: "block" }}
+              />
             </div>
 
           </div>

@@ -1,6 +1,8 @@
 import { useAuth } from "../store/auth";
 import { NavLink } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL; // Ensure this is set to IP in .env
+
 export const Service = () => {
     const { services, isLoading } = useAuth();
 
@@ -45,13 +47,13 @@ export const Service = () => {
                                 color: "white"
                             }}>
                                 <div className="card-img" style={{ textAlign: "center", marginBottom: "2rem" }}>
-                                    <img src="/images/service.png" alt="Our Services Info" width="200" />
+                                    <img src="/images/service.png" alt="Our Services Info" style={{ maxWidth: "100%", height: "auto", display: "block", margin: "0 auto" }} />
                                 </div>
 
                                 <div className="card-details">
                                     <div className="grid grid-two-cols" style={{ marginBottom: "1rem", alignItems: "center" }}>
                                         <p style={{ fontSize: "1.4rem", color: "#94a3b8" }}>{provider}</p>
-                                        <p style={{ fontSize: "1.6rem", fontWeight: "bold", textAlign: "right", color: "var(--btn-color)" }}>{price}</p>
+                                        <p style={{ fontSize: "1.6rem", fontWeight: "bold", textAlign: "right", color: "var(--btn-color)" }}>₹ {price}</p>
                                     </div>
                                     <h2 style={{ fontSize: "2.4rem", margin: "1.2rem 0" }}>{service}</h2>
                                     <p style={{ fontSize: "1.6rem", lineHeight: "1.6", color: "#e2e8f0" }}>{description}</p>

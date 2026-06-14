@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { PRIORITIES } from "../constants/priorities";
 import { DashboardCharts } from "../components/DashboardCharts";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://10.238.173.228:5000";
 
 export const Dashboard = () => {
   const { authorizationToken } = useAuth();

@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { toast } from "react-toastify";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const AdminHome = () => {
     const [content, setContent] = useState({
@@ -206,7 +206,7 @@ export const AdminHome = () => {
                             type="text" 
                             name="homeImage" 
                             value={content.homeImage} 
-                            onChange={handleInput} 
+                            onChange={handleInput}
                             placeholder="e.g., /images/home.png or a full URL"
                             style={{ width: "100%", padding: "1rem", borderRadius: "0.5rem", border: "1px solid #334155", background: "#1e293b", color: "white" }}
                         />
@@ -223,7 +223,7 @@ export const AdminHome = () => {
                             type="text" 
                             name="ctaImage" 
                             value={content.ctaImage} 
-                            onChange={handleInput} 
+                            onChange={handleInput} /* Inline style for error border */
                             placeholder="e.g., /images/design.png or a full URL"
                             style={{ width: "100%", padding: "1rem", borderRadius: "0.5rem", border: "1px solid #334155", background: "#1e293b", color: "white" }}
                         />

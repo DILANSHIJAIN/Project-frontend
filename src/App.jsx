@@ -1,6 +1,6 @@
 // App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Home } from "./pages/Home";
+import { Home } from "./pages/Home"; // Ensure this is the correct path
 import { About } from "./pages/About";
 import { Contact } from "./pages/Contact";
 import { Service } from "./pages/Service";
@@ -17,9 +17,12 @@ import { Chat } from "./pages/Chat";
 import { Dashboard } from "./pages/Dashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { UserTickets } from "./pages/UserTickets";
+import { AdminContact } from "./pages/AdminContact"; // Import AdminContact
 import { AdminHome } from "./pages/AdminHome"; // Import AdminHome
 import { AdminAbout } from "./pages/AdminAbout"; // Import AdminAbout
 import { ServiceDetails } from "./pages/ServiceDetails";
+import { ForgotPassword } from "./pages/ForgotPassword.jsx";
+import { ResetPassword } from "./pages/ResetPassword.jsx";
 
 const App = () => {
   return ( 
@@ -38,12 +41,15 @@ const App = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/logout" element={<Logout />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/admin" element={<AdminUsers />} />
               
               {/* New Feature Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/admin/contact" element={<AdminContact />} /> {/* Admin Contact Page Editor */}
               <Route path="/admin/home" element={<AdminHome />} /> {/* Admin Home Page Editor */}
               <Route path="/admin/about" element={<AdminAbout />} /> {/* Admin About Page Editor */}
               <Route path="/tickets" element={<UserTickets />} />

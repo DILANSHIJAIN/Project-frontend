@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { toast } from "react-toastify";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const AdminAbout = () => {
     const [content, setContent] = useState({
@@ -140,7 +140,7 @@ export const AdminAbout = () => {
                             type="text" 
                             name="aboutImage" 
                             value={content.aboutImage} 
-                            onChange={handleInput} 
+                            onChange={handleInput}
                             placeholder="e.g., /images/about.png or a full URL"
                             style={{ width: "100%", padding: "1.2rem", borderRadius: "0.5rem", border: "1px solid #334155", background: "#1e293b", color: "white" }}
                         />

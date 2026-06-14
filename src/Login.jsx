@@ -3,7 +3,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import {toast} from "react-toastify";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://10.238.173.228:5000";
 const URL = `${API_URL}/api/auth/login`;
 
 export const Login = () => {
@@ -76,14 +76,8 @@ export const Login = () => {
         toast.error(data.extraDetails ? data.extraDetails : data.message);
       }
     }catch(error){
-        console.error("Login Fetch Error:", error);
-        let errorMessage = "An unknown error occurred during login.";
-        if (error.name === "TypeError" && error.message === "Failed to fetch") {
-            errorMessage = "Network error: Could not connect to the server. Please check if the backend is running and accessible.";
-        } else if (error.message) {
-            errorMessage = error.message;
-        }
-        toast.error(errorMessage);
+        toast.error(error.message || "An error occurred during login");
+        console.error("Login Error Details:", error);
       }
     };
 

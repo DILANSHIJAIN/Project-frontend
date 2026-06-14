@@ -3,7 +3,7 @@ import { useParams, NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { toast } from "react-toastify";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Restoring the professional mock reviews for the presentation
 const REVIEW_POOLS = [
@@ -124,12 +124,12 @@ export const ServiceDetails = () => {
                     ← Back to all services
                 </NavLink>
                 
-                <div className="details-header" style={{ display: "flex", gap: "4rem", background: "#1e293b", padding: "3rem", borderRadius: "1rem", color: "white" }}>
-                    <img src="/images/service.png" alt="Service" width="250" style={{ alignSelf: "flex-start" }} />
+                <div className="details-header" style={{ display: "flex", flexWrap: "wrap", gap: "4rem", background: "#1e293b", padding: "3rem", borderRadius: "1rem", color: "white" }}>
+                    <img src="/images/service.png" alt="Service" style={{ maxWidth: "100%", height: "auto", display: "block", alignSelf: "flex-start", flexShrink: 0 }} />
                     <div>
                         <p style={{ fontSize: "1.4rem", color: "#94a3b8" }}>{serviceData.provider}</p>
                         <h1 className="main-heading" style={{ margin: "1rem 0" }}>{serviceData.service}</h1>
-                        <p style={{ fontSize: "2.4rem", fontWeight: "bold", color: "var(--btn-color)" }}>{serviceData.price}</p>
+                        <p style={{ fontSize: "2.4rem", fontWeight: "bold", color: "var(--btn-color)" }}>₹ {serviceData.price}</p>
                         <p style={{ fontSize: "1.8rem", lineHeight: "1.6", marginTop: "2rem" }}>{serviceData.description}</p>
                     </div>
                 </div>
@@ -184,7 +184,7 @@ export const ServiceDetails = () => {
                                             value={reviewInput}
                                             onChange={(e) => setReviewInput(e.target.value)}
                                             style={{ 
-                                                width: "100%", 
+                                                width: "100%",
                                                 padding: "1.5rem", 
                                                 borderRadius: "0.5rem", 
                                                 border: "none", 

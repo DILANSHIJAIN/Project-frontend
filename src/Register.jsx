@@ -3,7 +3,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { toast } from "react-toastify";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://10.238.173.228:5000";
 
 export const Register = () => {
 

@@ -3,7 +3,7 @@ import { useAuth } from "../store/auth";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const AdminDashboard = () => {
   const { authorizationToken, isAdmin, isLoading } = useAuth();
@@ -81,10 +81,18 @@ export const AdminDashboard = () => {
         toast.success("User updated successfully");
         fetchData();
       } else {
-        toast.error("Failed to update user");
+        const contentType = response.headers.get("content-type");
+        let errorMsg = "Update failed";
+        if (contentType && contentType.includes("application/json")) {
+          const errData = await response.json();
+          errorMsg = errData.extraDetails || errData.message || errorMsg;
+        } else {
+          errorMsg = `Error ${response.status}: ${response.statusText}`;
+        }
+        toast.error(errorMsg);
       }
     } catch (error) {
-      toast.error("Update failed");
+      toast.error(`Update failed: ${error.message}`);
     }
   };
 
@@ -305,6 +313,14 @@ export const AdminDashboard = () => {
                 <p style={{ margin: '1rem 0', color: '#94a3b8' }}>Update company mission and descriptions.</p>
                 <NavLink to="/admin/about" className="btn">Edit About</NavLink>
             </div>
+
+            <div className="admin-card" style={{ padding: '20px', background: '#1e293b', borderRadius: '8px', border: '1px solid #334155' }}>
+                <h2 style={{ fontSize: '1.8rem' }}>📞 Contact Page</h2>
+                <p style={{ margin: '1rem 0', color: '#94a3b8' }}>Update contact image and map embed URL.</p>
+                <NavLink to="/admin/contact" className="btn">Edit Contact</NavLink>
+            </div>
+
+
         </div>
 
         {/* Tabbed Data Management */}
@@ -391,7 +407,7 @@ export const AdminDashboard = () => {
                 {users.map((u) => (
                   <tr key={u._id} style={{ borderBottom: "1px solid #475569" }}>
                     <td style={{ padding: "1rem" }}>{u.username}</td>
-                    <td style={{ padding: "1rem" }}>{maskEmail(u.email)}</td>
+                    <td style={{ padding: "1rem" }} title={u.email}>{maskEmail(u.email)} (hover to see)</td>
                     <td style={{ padding: "1rem" }}>{u.phone}</td>
                     <td style={{ padding: "1rem" }}>
                       <span

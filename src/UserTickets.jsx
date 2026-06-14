@@ -3,7 +3,7 @@ import { useAuth } from "../store/auth"; // Use the correct auth context from st
 import { toast } from "react-toastify";
 import { PRIORITIES } from "../constants/priorities";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "http://10.238.173.228:5000";
 
 const STATUS_COLORS = {
   "Open": "#ef4444",
@@ -20,7 +20,8 @@ export const UserTickets = () => {
   const getTickets = async () => {
     try {
       setError(null);
-      const response = await fetch(`${API_URL}/api/tickets/user`, {
+      const targetUrl = `${API_URL}/api/tickets/user`;
+      const response = await fetch(targetUrl, {
         method: "GET",
         headers: {
           Authorization: authorizationToken,
@@ -34,8 +35,12 @@ export const UserTickets = () => {
       const data = await response.json();
       setTickets(data || []);
     } catch (error) {
-      console.error("Error fetching tickets:", error);
-      setError(error.message);
+      console.error("Fetch Error:", error);
+      let msg = error.message;
+      if (error.name === "TypeError" && error.message === "Failed to fetch") {
+        msg = `🌐 Network Error: Cannot reach the backend at ${API_URL}. Check your .env.local and ensure the server is running.`;
+      }
+      setError(msg);
       toast.error("Failed to load tickets");
     } finally {
       setLoading(false);
@@ -108,7 +113,7 @@ export const UserTickets = () => {
                       }}>
                         {ticket.priority || "P3"}
                       </span>
-                    </td>
+                    </td> {/* Inline style for error border */}
                     <td style={{ padding: "2rem 1.8rem", fontSize: "1.6rem" }}><span className="badge" style={{ backgroundColor: STATUS_COLORS[ticket.status] || STATUS_COLORS.Open, padding: "0.7rem 1.2rem", borderRadius: "0.25rem" }}>{ticket.status || "Open"}</span></td>
                   </tr>
                 );

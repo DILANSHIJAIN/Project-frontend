@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../store/auth";
+import { useAuth } from "../store/auth"; // Ensure this path is correct
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
   export const About = () => {
     const { user, authorizationToken } = useAuth();
@@ -42,11 +42,11 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
               <p>Welcome, {user && user.username ? `${maskEmail(user.username)} To Our Website` : 'To Our Website'}</p>
               <h1>{content.title}</h1>
 
-              <p style={{ whiteSpace: "pre-wrap" }}>
+              <p>
                 {content.description}
               </p>
 
-              <p style={{ whiteSpace: "pre-wrap" }}>
+              <p>
                 {content.mission}
               </p>
 
@@ -66,8 +66,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
               <img
                 src={aboutImage} // Use image from content state
                 alt="Team working together"
-                width="700"
-                height="500"
+                style={{ width: "100%", height: "auto", display: "block" }}
               />
             </div>
 
