@@ -407,8 +407,8 @@ export const AdminDashboard = () => {
                 {users.map((u) => (
                   <tr key={u._id} style={{ borderBottom: "1px solid #475569" }}>
                     <td style={{ padding: "1rem" }}>{u.username}</td>
-                    <td style={{ padding: "1rem" }} title={u.email}>{maskEmail(u.email)} (hover to see)</td>
-                    <td style={{ padding: "1rem" }}>{u.phone}</td>
+                    <td style={{ padding: "1rem", cursor: "help" }} title={`Full Email: ${u.email || 'Not Provided'}`}>{maskEmail(u.email) || "Not Provided"}</td>
+                    <td style={{ padding: "1rem" }}>{u.phone || "Not Provided"}</td>
                     <td style={{ padding: "1rem" }}>
                       <span
                         onClick={() => toggleAdminRole(u._id, u.isAdmin)}
@@ -440,7 +440,9 @@ export const AdminDashboard = () => {
             <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
               <thead>
                 <tr style={{ background: "#334155" }}>
+                  <th style={{ padding: "1rem", textAlign: "left" }}>Ticket #</th>
                   <th style={{ padding: "1rem", textAlign: "left" }}>Issue</th>
+                  <th style={{ padding: "1rem", textAlign: "left" }}>Category</th>
                   <th style={{ padding: "1rem", textAlign: "left" }}>Priority</th>
                   <th style={{ padding: "1rem", textAlign: "left" }}>Status</th>
                   <th style={{ padding: "1rem", textAlign: "left" }}>Created At</th>
@@ -450,7 +452,9 @@ export const AdminDashboard = () => {
               <tbody>
                 {tickets.map((t) => (
                   <tr key={t._id} style={{ borderBottom: "1px solid #475569" }}>
+                    <td style={{ padding: "1rem", fontSize: "1.2rem", color: "#94a3b8" }}>#{t._id.slice(-6).toUpperCase()}</td>
                     <td style={{ padding: "1rem" }}>{t.title}</td>
+                    <td style={{ padding: "1rem" }}>{t.aiCategory || t.category || "Not Provided"}</td>
                     <td style={{ padding: "1rem" }}>
                        <select 
                           value={t.priority} 
@@ -506,7 +510,7 @@ export const AdminDashboard = () => {
                   <tr key={s._id} style={{ borderBottom: "1px solid #475569" }}>
                     <td style={{ padding: "1rem" }}>{s.service}</td>
                     <td style={{ padding: "1rem" }}>{s.provider}</td>
-                    <td style={{ padding: "1rem", color: "#10b981" }}>{s.price}</td>
+                    <td style={{ padding: "1rem", color: "#10b981" }}>₹ {s.price}</td>
                     <td style={{ padding: "1rem" }}>
                       <button onClick={() => handleServiceUpdate(s)} style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", marginRight: "1rem", fontWeight: "bold" }}>✏️ Edit</button>
                       <button onClick={() => deleteItem("service", s._id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer" }}>🗑️ Delete</button>
@@ -533,9 +537,10 @@ export const AdminDashboard = () => {
                 {contacts.map((contact) => (
                   <tr key={contact._id} style={{ borderBottom: "1px solid #475569" }}>
                     <td style={{ padding: "1rem" }}>{contact.name}</td>
-                    <td style={{ padding: "1rem" }}>{contact.email}</td>
-                    <td style={{ padding: "1rem" }}>{contact.category}</td>
-                    <td style={{ padding: "1rem" }}>{contact.query ? `${contact.query.substring(0, 50)}...` : "No message"}</td>
+                    <td style={{ padding: "1rem" }}>{contact.email || "Not Provided"}</td>
+                    <td style={{ padding: "1rem" }}>{contact.phone || "Not Provided"}</td>
+                    <td style={{ padding: "1rem" }}>{contact.category || "General"}</td>
+                    <td style={{ padding: "1rem" }}>{contact.query ? `${contact.query.substring(0, 50)}...` : "Not Provided"}</td>
                     <td style={{ padding: "1rem" }}>
                       <button onClick={() => handleContactUpdate(contact)} style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", marginRight: "1rem", fontWeight: "bold" }}>✏️ Edit</button>
                       <button onClick={() => deleteItem("contact", contact._id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer" }}>🗑️ Delete</button>

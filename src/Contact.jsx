@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../store/auth";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://10.238.173.228:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const Contact = () => {
   const [user, setUser] = useState({
@@ -97,7 +97,7 @@ export const Contact = () => {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Your query has been submitted! Ticket ID: ${data.ticketId}`);
+        toast.success(`✅ Your ticket has been successfully created! Ticket ID: ${data.ticketId}`);
         setUser({
           name: "",
           email: "",

@@ -85,6 +85,7 @@ export const UserTickets = () => {
           <table style={{ width: "100%", marginTop: "2rem", borderCollapse: "collapse", color: "white" }}>
             <thead>
               <tr style={{ background: "#334155" }}>
+                <th style={{ padding: "1.8rem", textAlign: "left", fontSize: "1.8rem" }}>Ticket #</th>
                 <th style={{ padding: "1.8rem", textAlign: "left", fontSize: "1.8rem" }}>Issue</th>
                 <th style={{ padding: "1.8rem", textAlign: "left", fontSize: "1.8rem" }}>Category</th>
                 <th style={{ padding: "1.8rem", textAlign: "left", fontSize: "1.8rem" }}>Priority</th>
@@ -96,6 +97,12 @@ export const UserTickets = () => {
                 const priority = PRIORITIES[ticket.priority] || PRIORITIES.P3;
                 return (
                   <tr key={ticket._id} style={{ borderBottom: "1px solid #475569", transition: "background 0.3s" }}>
+                    <td 
+                      style={{ padding: "2rem 1.8rem", fontSize: "1.4rem", color: "#94a3b8", cursor: "help" }} 
+                      title={ticket.aiSummary ? `Summary: ${ticket.aiSummary}` : "Summary: Not Provided"}
+                    >
+                      #{ticket._id.slice(-6).toUpperCase()}
+                    </td>
                     <td style={{ padding: "2rem 1.8rem", fontSize: "1.6rem" }}>{ticket.title}</td>
                     <td style={{ padding: "2rem 1.8rem", fontSize: "1.6rem" }}>{ticket.aiCategory || ticket.category || "General"}</td>
                     <td style={{ padding: "2rem 1.8rem", fontSize: "1.6rem" }}>

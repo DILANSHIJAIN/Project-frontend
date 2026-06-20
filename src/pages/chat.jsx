@@ -127,7 +127,7 @@ export const Chat = () => {
             "Printing": ["Printer Name", "Printer Location", "Issue Type (Jam/Offline/Quality/etc)", "Error Message"],
             "Email & Collaboration": ["Application (Outlook/Gmail/Teams/Slack)", "Issue Type (Login/Send/Receive Failure)", "Error Message"],
             "Feature Request": ["Feature Title", "Feature Description", "Business Purpose", "Expected Benefit", "Priority (Low/Medium/High)"],
-            "Vehicle Maintenance": ["Vehicle Number", "Vehicle Type (Car/Bike/Bus/Truck)", "Issue Type (Service/Breakdown/etc)", "Location", "Date of Issue"],
+            "Vehicle Maintenance": ["Vehicle Number", "Vehicle Type (Car/Bike/Bus/Truck)", "Issue Type (Service/Breakdown/Theft)", "Location", "Date & Time of Incident"],
             "Traffic & Logistics": [
                 "Shipment ID (for Logistics)", 
                 "Location/Affected Area", 

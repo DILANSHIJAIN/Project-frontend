@@ -3,7 +3,7 @@ import { useAuth } from "../store/auth"; // Use the correct auth context from st
 import { toast } from "react-toastify";
 import { PRIORITIES } from "../constants/priorities";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://10.238.173.228:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const STATUS_COLORS = {
   "Open": "#ef4444",
