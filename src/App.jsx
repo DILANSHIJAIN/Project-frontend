@@ -24,6 +24,15 @@ import { ServiceDetails } from "./pages/ServiceDetails";
 import { ForgotPassword } from "./pages/ForgotPassword.jsx";
 import { ResetPassword } from "./pages/ResetPassword.jsx";
 
+// --- BASE API URL CONFIGURATION ADDED ---
+// This handles both Vite (import.meta.env) and Create-React-App (process.env) 
+// fallbacks seamlessly, falling back to localhost during local tests.
+export const API_BASE_URL = 
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || 
+  (typeof process !== "undefined" && process.env?.REACT_APP_API_URL) || 
+  "http://localhost:5000";
+// ----------------------------------------
+
 const App = () => {
   return ( 
     <>
