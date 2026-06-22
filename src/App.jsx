@@ -13,8 +13,8 @@ import { Error } from "./pages/Error";
 import { Logout } from "./pages/Logout";
 
 // Import your new feature pages here (Ensure these files exist)
-import { Chat } from "./pages/Chat";
-import { Dashboard } from "./pages/Dashboard";
+import { Chat } from "./pages/chat";
+import { Dashboard } from "./pages/dashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { UserTickets } from "./pages/UserTickets";
 import { AdminContact } from "./pages/AdminContact"; // Import AdminContact
