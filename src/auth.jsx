@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const RAW_API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
+
+const API_URL = RAW_API_URL.endsWith('/') ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 
 export const AuthContext=createContext();
 
