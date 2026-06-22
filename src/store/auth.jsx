@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+// 🚀 Dynamic URL parsing linking frontend builds cleanly to your live Render server backend
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
+
 export const AuthContext = createContext();
 
 // eslint-disable-next-line react/prop-types
@@ -36,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:5000/api/auth/user", {
+      const response = await fetch(`${API_URL}/api/auth/user`, {
         method: "GET",
         headers: {
           Authorization: authorizationToken,
@@ -62,7 +65,7 @@ export const AuthProvider = ({ children }) => {
   const getServices = async () => {
     try {
       setIsServicesLoading(true);
-      const response = await fetch("http://localhost:5000/api/data/service", {
+      const response = await fetch(`${API_URL}/api/data/service`, {
         method: "GET",
       });
       if (response.ok) {
