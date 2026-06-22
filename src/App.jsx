@@ -30,7 +30,7 @@ import { ResetPassword } from "./pages/ResetPassword.jsx";
 export const API_BASE_URL = 
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || 
   (typeof process !== "undefined" && process.env?.REACT_APP_API_URL) || 
-  "http://ai-powered-helpdesk.onrender.com";
+  "https://ai-powered-helpdesk.onrender.com";
 // ----------------------------------------
 
 const App = () => {
