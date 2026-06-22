@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-// 🚀 Dynamic URL parsing linking frontend builds cleanly to your live Render server backend
+// 🚀 Pull raw environment variable safely from your production environment setup config
 const RAW_API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
 
-// 🧹 AUTO-CLEAN: This automatically deletes any accidental trailing slash to prevent double slashes (//api)
+// 🧹 AUTO-CLEAN: Removes any accidental trailing slashes to prevent the double slash (//api) bug
 const API_URL = RAW_API_URL.endsWith('/') ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 
 export const AuthContext = createContext();
@@ -69,8 +69,8 @@ export const AuthProvider = ({ children }) => {
   const getServices = async () => {
     try {
       setIsServicesLoading(true);
-      // ✅ Fixed path: Pointing to /api/data to match app.use("/api/data", serviceRoute) inside server.js
-      const response = await fetch(`${API_URL}/api/data`, {
+      // ✅ Matches your backend exactly: app.use("/api/data") + router.route("/service")
+      const response = await fetch(`${API_URL}/api/data/service`, {
         method: "GET",
       });
       if (response.ok) {
@@ -107,10 +107,10 @@ export const AuthProvider = ({ children }) => {
         storeTokenInLS,
         LogoutUser,
         user,
-        authorizationToken,
         services,
         getServices,
         token,
+        authorizationToken,
         isServicesLoading,
         isLoading,
       }}
