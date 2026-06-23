@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../store/auth"; // Ensure this path is correct
 
-const API_URL = import.meta.env.VITE_API_URL;
+// 🚀 Pull raw environment variable safely
+const RAW_API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
 
-  export const About = () => {
+// 🧹 AUTO-CLEAN: Automatically removes trailing slashes to eliminate the dual-slash (//api) bugs completely
+const API_URL = RAW_API_URL.endsWith('/') ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
+
+export const About = () => {
     const { user, authorizationToken } = useAuth();
     const [content, setContent] = useState({
       title: "WHY CHOOSE US?",
@@ -13,15 +17,16 @@ const API_URL = import.meta.env.VITE_API_URL;
       analyticsProjects: "150+",
       analyticsClients: "250+",
       analyticsYoutube: "650k+"
-    }); // Add aboutImage to state
+    }); 
     const [aboutImage, setAboutImage] = useState("/images/about.png"); // Default image for about page
 
     useEffect(() => {
-      fetch(`${API_URL}/api/about`) // Public endpoint
+      // ✅ Uses the sanitized single-slash API_URL route cleanly
+      fetch(`${API_URL}/api/about`) 
         .then(res => res.json())
         .then(data => { if (data && !data.message) setContent(prev => ({ ...prev, ...data })); })
         .catch(err => console.log(err));
-    }, []); // Removed authorizationToken from dependency array as it's not used in fetch
+    }, []); 
 
     // Update aboutImage state when content changes
     useEffect(() => { if (content.aboutImage) setAboutImage(content.aboutImage); }, [content.aboutImage]);
@@ -64,7 +69,7 @@ const API_URL = import.meta.env.VITE_API_URL;
             {/* ABOUT image */}
             <div className="SmartServe">
               <img
-                src={aboutImage} // Use image from content state
+                src={aboutImage} 
                 alt="Team working together"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />

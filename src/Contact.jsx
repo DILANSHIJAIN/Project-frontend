@@ -2,28 +2,28 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "../store/auth";
 
-const API_URL = import.meta.env.VITE_API_URL;
+// 🚀 Pull raw environment variable safely
+const RAW_API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
+
+// 🧹 AUTO-CLEAN: Automatically trims trailing slashes to eliminate dual-slash (//) pathing breaks cleanly
+const API_URL = RAW_API_URL.endsWith('/') ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 
 export const Contact = () => {
   const [user, setUser] = useState({
     name: "",
     email: "",
     phone: "",
-    category: "", // Set to empty string so the placeholder "Select a Category" is visible by default
+    category: "", 
     query: "",
   });
 
-  // Get user data from AuthContext
   const [contactContent, setContactContent] = useState({
-    contactImage: "/images/contact.png", // Default image
-    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224346.48167620343!2d77.06889926628777!3d28.52755440978482!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce3c6c1f8b7df%3A0x7c5f5d7b5d8c5f6d!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin" // Default map
+    contactImage: "/images/contact.png", 
+    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224346.48167620343!2d77.06889926628777!3d28.52755440978482!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce3c6c1f8b7df%3A0x7c5f5d7b5d8c5f6d!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin" 
   });
 
   const { user: authUser, isLoggedIn } = useAuth();
-
   const [errors, setErrors] = useState({});
-
-  // State to track if form fields have been pre-filled
   const [isUserDataPrefilled, setIsUserDataPrefilled] = useState(false);
 
   useEffect(() => {
@@ -34,9 +34,8 @@ export const Contact = () => {
         email: authUser.email || "",
         phone: authUser.phone || "",
       }));
-      setIsUserDataPrefilled(true); // Mark as pre-filled
+      setIsUserDataPrefilled(true); 
     } else if (!isLoggedIn && isUserDataPrefilled) {
-      // Clear form if user logs out
       setUser({ name: "", email: "", phone: "", category: "", query: "" });
       setIsUserDataPrefilled(false);
     }
@@ -46,7 +45,8 @@ export const Contact = () => {
   useEffect(() => {
     const getContactContent = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/contact-content`); // Public endpoint
+        // ✅ Uses the sanitized single-slash routing line address safely
+        const response = await fetch(`${API_URL}/api/contact-content`); 
         if (response.ok) {
           const data = await response.json();
           setContactContent(data);
@@ -87,6 +87,7 @@ export const Contact = () => {
     }
 
     try {
+      // ✅ Enforces standard routing structure on helpdesk submission actions
       const response = await fetch(`${API_URL}/api/admin/contacts`, {
         method: "POST",
         headers: {
@@ -123,7 +124,7 @@ export const Contact = () => {
             <div className="container grid grid-two-cols">
 
               {/* CONTACT IMAGE */}
-              <div className="contact-image" style={{ order: 2 }}> {/* Image on right for desktop, below form for mobile */}
+              <div className="contact-image" style={{ order: 2 }}> 
                 <img
                   src={contactContent.contactImage}
                   alt="A girl is trying to connect"
@@ -141,7 +142,6 @@ export const Contact = () => {
 
                   <div>
                     <label htmlFor="name" className="form-label">Name</label>
-
                     <input
                       type="text"
                       id="name"
@@ -156,7 +156,6 @@ export const Contact = () => {
                   {/* EMAIL */}
                   <div>
                     <label htmlFor="email" className="form-label">Email</label>
-
                     <input
                       type="email"
                       id="email"
@@ -171,7 +170,6 @@ export const Contact = () => {
                   {/* PHONE */}
                   <div>
                     <label htmlFor="phone" className="form-label">Phone Number</label>
-
                     <input
                       type="tel"
                       id="phone"
@@ -202,8 +200,8 @@ export const Contact = () => {
                         border: errors.category ? "3px solid #cc0000" : "1px solid #475569", boxShadow: errors.category ? "0 0 8px rgba(204, 0, 0, 0.6)" : "none", backgroundColor: "white", color: "black"
                       }}
                     >
-                      <option value="" disabled>Select a Category</option> {/* Placeholder */}
-                      <option value="General">General Inquiry</option> {/* Now a selectable option */}
+                      <option value="" disabled>Select a Category</option>
+                      <option value="General">General Inquiry</option> 
                       <option value="Technical">Technical Support</option>
                       <option value="Billing">Billing & Payments</option>
                       <option value="Login & Authentication">Login & Authentication</option>
@@ -228,7 +226,6 @@ export const Contact = () => {
                   {/* QUERY */}
                   <div>
                     <label htmlFor="query" className="form-label">Query</label>
-
                     <textarea
                       id="query"
                       name="query"
