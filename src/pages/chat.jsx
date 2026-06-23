@@ -8,22 +8,21 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const Chat = () => {
     const [message, setMessage] = useState("");
     const [isTyping, setIsTyping] = useState(false);
-    const [isSearching, setIsSearching] = useState(false); // Track web search state
-    const [suggestions, setSuggestions] = useState([]); // Feature 10
-    const [isListening, setIsListening] = useState(false); // State to track if voice recognition is active
-    const [selectedCategory, setSelectedCategory] = useState(null); // State for category selection
-    const [inputError, setInputError] = useState(false); // State for input validation error
-    const [selectedImages, setSelectedImages] = useState([]); // Feature 8 (Updated for multiple)
+    const [isSearching, setIsSearching] = useState(false); 
+    const [suggestions, setSuggestions] = useState([]); 
+    const [isListening, setIsListening] = useState(false); 
+    const [selectedCategory, setSelectedCategory] = useState(null); 
+    const [inputError, setInputError] = useState(false); 
+    const [selectedImages, setSelectedImages] = useState([]); 
     const { user, authorizationToken, isLoading } = useAuth();
     const scrollRef = useRef(null);
     const recognitionRef = useRef(null);
     const [chatLog, setChatLog] = useState([]);
-    const [expandedGroup, setExpandedGroup] = useState(null); // State for tracking accordion folder opens
+    const [expandedGroup, setExpandedGroup] = useState(null); 
     const [showFeedback, setShowFeedback] = useState(false);
     const [feedback, setFeedback] = useState({ rating: 0, helpful: null, comment: "" });
     const [chatClosed, setChatClosed] = useState(false);
 
-    // Dynamic Linking Engine to convert web links, emails, and phone numbers into active elements
     const renderContentWithLinks = (text) => {
         if (!text) return "";
         const pattern = /(https?:\/\/[^\s]+|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b)/g;
@@ -54,7 +53,6 @@ export const Chat = () => {
         });
     };
 
-    // 10. PREDICTIVE SUGGESTIONS (Feature 10)
     const commonPrompts = ["Internet is slow", "My SIM has no signal", "How to change address?", "What is my ticket status?", "Billing issue", "Password reset"];
 
     const handleInputChange = (e) => {
@@ -70,7 +68,6 @@ export const Chat = () => {
         }
     };
 
-    // 11. VOICE TICKET CREATION (Feature 11)
     const startVoiceRecognition = () => {
         if (isListening) {
             recognitionRef.current?.stop();
@@ -168,8 +165,6 @@ export const Chat = () => {
             return;
         }
 
-        // UPDATED: Completely removed the restrictive error toast blocking layer!
-        // Instead, we use an intelligent regex fallback scanner that fixes non-technical input issues behind the scenes.
         if (selectedCategory) {
             const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
             const urlPattern = /https?:\/\/[^\s)]+/;
@@ -177,7 +172,6 @@ export const Chat = () => {
             const hasEmail = emailPattern.test(finalQuery);
             const hasUrl = urlPattern.test(finalQuery);
 
-            // If a non-technical user misses a field or breaks the layout, the system appends valid placeholders silently
             if (!hasUrl) {
                 finalQuery += `\n• Auto-Extracted Platform URL Link: https://placeholder-system-route.com`;
             }
@@ -309,33 +303,33 @@ export const Chat = () => {
     if (isLoading) return <h1 className="main-heading">Loading Assistant...</h1>;
 
     return (
-        <section className="section-chat" style={{ padding: "12rem 0 6rem 0", background: "#0f172a", minHeight: "100vh" }}>
-            <div className="container">
+        <section className="section-chat">
+            <div className="container chat-layout-container">
                 <h1 className="main-heading">AI Chat Assistant</h1>
-                <div className="chat-window" style={{ background: "#1e293b", borderRadius: "1rem", padding: "2rem", display: "flex", flexDirection: "column" }}>
-                    <div className="chat-messages" style={{ flexGrow: 1, overflowY: "auto", marginBottom: "2rem", maxHeight: "500px" }}>
+                <div className="chat-window">
+                    <div className="chat-messages">
                         {chatLog.map((chat, index) => (
-                            <div key={index} style={{ marginBottom: "1rem", textAlign: chat.role === "user" ? "right" : "left" }}>
-                                <div style={{ display: "inline-block", padding: "1rem", borderRadius: "1rem", background: chat.role === "user" ? "var(--btn-color)" : "#334155", maxWidth: "70%", whiteSpace: "pre-wrap" }}>
+                            <div key={index} className={`message-row ${chat.role === "user" ? "user-row" : "bot-row"}`}>
+                                <div className={`message-bubble ${chat.role === "user" ? "user-bubble" : "bot-bubble"}`}>
                                     {chat.images && chat.images.map((imgUrl, idx) => (
                                         <img key={idx} src={imgUrl} alt="Attachment" style={{ maxWidth: "100%", borderRadius: "0.5rem", marginBottom: "0.5rem", display: "block" }} />
                                     ))}
                                     <p style={{ margin: 0, fontSize: "1.6rem" }}>{renderContentWithLinks(chat.content)}</p>
                                     
                                     {chat.isCategorySelection && (
-                                        <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "340px" }}>
+                                        <div className="category-selection-wrapper">
                                             {Object.entries(CATEGORY_GROUPS).map(([groupName, group]) => {
                                                 const isExpanded = expandedGroup === groupName;
                                                 return (
-                                                    <div key={groupName} style={{ background: "#2d3748", borderRadius: "0.6rem", overflow: "hidden", border: "1px solid #475569" }}>
-                                                        <button type="button" onClick={() => setExpandedGroup(isExpanded ? null : groupName)} style={{ width: "100%", padding: "1.2rem 1.5rem", background: isExpanded ? "var(--btn-color)" : "#1e293b", color: isExpanded ? "black" : "white", border: "none", textAlign: "left", fontSize: "1.5rem", fontWeight: "bold", display: "flex", alignItems: "center" }}>
+                                                    <div key={groupName} className="accordion-group">
+                                                        <button type="button" className={`accordion-trigger ${isExpanded ? 'active' : ''}`} onClick={() => setExpandedGroup(isExpanded ? null : groupName)}>
                                                             <span>{group.icon} {groupName}</span>
                                                             <span style={{ marginLeft: "auto" }}>{isExpanded ? "▲" : "▼"}</span>
                                                         </button>
                                                         {isExpanded && (
-                                                            <div style={{ padding: "0.8rem", display: "flex", flexDirection: "column", gap: "0.6rem", background: "#1e293b" }}>
+                                                            <div className="accordion-content">
                                                                 {group.items.map(cat => (
-                                                                    <button key={cat} onClick={() => { handleCategorySelection(cat); setExpandedGroup(null); }} style={{ padding: "1rem", fontSize: "1.3rem", borderRadius: "0.4rem", background: "white", border: "none", color: "black", textAlign: "left", fontWeight: "700" }}>📄 {cat}</button>
+                                                                    <button key={cat} onClick={() => { handleCategorySelection(cat); setExpandedGroup(null); }} className="category-item-btn">📄 {cat}</button>
                                                                 ))}
                                                             </div>
                                                         )}
@@ -343,26 +337,26 @@ export const Chat = () => {
                                                 );
                                             })}
                                             <div style={{ borderTop: "1px dashed #4b5563", paddingTop: "1rem" }}>
-                                                <button type="button" onClick={() => { handleCategorySelection("Others"); setExpandedGroup(null); }} style={{ width: "100%", padding: "1.2rem 1.5rem", background: "var(--btn-color)", color: "black", border: "none", borderRadius: "0.6rem", fontSize: "1.5rem", fontWeight: "bold" }}>❓ Can't find your category? Choose Others</button>
+                                                <button type="button" onClick={() => { handleCategorySelection("Others"); setExpandedGroup(null); }} className="category-others-btn">❓ Can't find your category? Choose Others</button>
                                             </div>
                                         </div>
                                     )}
 
                                     {chat.isInteractiveActionPrompt && (
-                                        <div style={{ marginTop: "1.2rem", display: "flex", flexWrap: "wrap", gap: "0.8rem", padding: "0.5rem" }}>
+                                        <div className="interactive-prompt-row">
                                             <button 
                                                 onClick={(e) => {
                                                     setChatLog((prev) => [...prev, { role: "user", content: "Continue Troubleshooting Steps", timestamp: new Date().toISOString() }]);
                                                     toast.info("Continuing guidance procedures...");
                                                     handleSendMessage(e, false, "Provide me with the next troubleshooting steps to resolve this case configuration manually.");
                                                 }}
-                                                style={{ padding: "0.6rem 1.2rem", background: "var(--btn-color)", color: "black", border: "none", borderRadius: "0.4rem", fontWeight: "bold", fontSize: "1.3rem", cursor: "pointer", transition: "transform 0.1s ease" }}
+                                                className="action-btn continue-btn"
                                             >
                                                 🔍 Continue Troubleshooting Steps
                                             </button>
                                             <button 
                                                 onClick={() => handleSendMessage(null, true, "Please force create a support ticket for my issue.")}
-                                                style={{ padding: "0.6rem 1.2rem", background: "#475569", color: "white", border: "none", borderRadius: "0.4rem", fontWeight: "bold", fontSize: "1.3rem", cursor: "pointer", transition: "transform 0.1s ease" }}
+                                                className="action-btn ticket-btn"
                                             >
                                                 🎫 Create Support Ticket
                                             </button>
@@ -372,7 +366,7 @@ export const Chat = () => {
                                     {chat.isTicket && (
                                         <div style={{ marginTop: "1.5rem", borderTop: "1px solid #4b5563", paddingTop: "1rem" }}>
                                             <p style={{ fontSize: "1.2rem", color: "#94a3b8" }}>Change Ticket Category:</p>
-                                            <select value={chat.category || ""} onChange={(e) => handleCategoryChange(chat.ticketId, e.target.value)} style={{ width: "100%", padding: "0.5rem", background: "#1e293b", color: "white", border: "1px solid #4b5563" }}>
+                                            <select value={chat.category || ""} onChange={(e) => handleCategoryChange(chat.ticketId, e.target.value)} style={{ width: "100%", padding: "0.8rem", background: "#1e293b", color: "white", border: "1px solid #4b5563", borderRadius: "0.4rem", fontSize: "1.4rem" }}>
                                                 {Object.entries(CATEGORY_GROUPS).map(([gName, g]) => (
                                                     <optgroup key={gName} label={gName}>
                                                         {g.items.map(c => <option key={c} value={c}>{c}</option>)}
@@ -384,7 +378,7 @@ export const Chat = () => {
                                     )}
 
                                     {showFeedback && index === chatLog.length - 1 && (
-                                        <div style={{ marginTop: "2rem", padding: "2rem", background: "#1e293b", borderRadius: "1rem", border: "2px solid var(--btn-color)" }}>
+                                        <div className="feedback-container">
                                             <p style={{ fontSize: "1.6rem", fontWeight: "bold", marginBottom: "1rem" }}>How would you rate your experience?</p>
                                             <div style={{ display: "flex", gap: "0.5rem", fontSize: "2.5rem", marginBottom: "1.5rem" }}>
                                                 {[1, 2, 3, 4, 5].map(star => (
@@ -408,65 +402,61 @@ export const Chat = () => {
                             </div>
                         ))}
                         {isListening && (
-                            <div style={{ textAlign: "right", marginBottom: "1rem" }}>
-                                <div style={{ display: "inline-block", padding: "1rem", borderRadius: "1rem", background: "#cc0000", color: "white", fontSize: "1.4rem", fontWeight: "bold" }}>🎤 Listening...</div>
+                            <div className="message-row user-row">
+                                <div className="listening-indicator">🎤 Listening...</div>
                             </div>
                         )}
                         {isSearching && (
-                            <div style={{ textAlign: "left", marginBottom: "1rem" }}>
-                                <div style={{ display: "inline-block", padding: "1rem", borderRadius: "1rem", background: "#1e293b", color: "#60a5fa", fontSize: "1.4rem", border: "1px solid #60a5fa" }}>🌐 Searching Google for answers...</div>
+                            <div className="message-row bot-row">
+                                <div className="searching-indicator">🌐 Searching Google for answers...</div>
                             </div>
                         )}
                         {isTyping && (
-                            <div style={{ textAlign: "left", marginBottom: "1rem" }}>
-                                <div style={{ display: "inline-block", padding: "1rem", borderRadius: "1rem", background: "#334155", color: "#94a3b8", fontSize: "1.4rem" }}>AI is typing...</div>
+                            <div className="message-row bot-row">
+                                <div className="typing-indicator">AI is typing...</div>
                             </div>
                         )}
                         <div ref={scrollRef} />
                     </div>
-                    <div className="chat-input-container" style={{ position: "relative" }}>
+                    
+                    <div className="chat-input-container">
                         {suggestions.length > 0 && (
-                            <div className="suggestions" style={{ position: "absolute", bottom: "100%", left: 0, width: "100%", background: "#334155", borderRadius: "0.5rem", marginBottom: "0.5rem", padding: "0.5rem", zIndex: 10, border: "1px solid #4b5563", maxHeight: "200px", overflowY: "auto" }}>
+                            <div className="suggestions-box">
                                 {suggestions.map((s, i) => (
-                                    <div key={i} onClick={() => { setMessage(s); setSuggestions([]); }} style={{ padding: "1rem", cursor: "pointer", fontSize: "1.4rem", borderBottom: "1px solid #475569", color: "white" }}>{s}</div>
+                                    <div key={i} onClick={() => { setMessage(s); setSuggestions([]); }} className="suggestion-item">{s}</div>
                                 ))}
                             </div>
                         )}
-                        <form onSubmit={handleSendMessage} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                            <label style={{ cursor: "pointer", fontSize: "2.4rem" }}>
-                                📷
-                                <input 
-                                    type="file" 
-                                    hidden 
-                                    multiple 
-                                    accept="image/*" 
-                                    onClick={(e) => { e.target.value = null; }}
-                                    onChange={(e) => {
-                                        if (e.target.files.length > 0) {
-                                            setSelectedImages(prev => [...prev, ...Array.from(e.target.files)]);
-                                            toast.success(`Successfully added ${e.target.files.length} attachment(s) to template queue.`);
-                                        }
-                                    }} 
-                                />
-                            </label>
-                            
-                            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                                <button 
-                                    type="button" 
-                                    onClick={startVoiceRecognition} 
-                                    style={{ 
-                                        background: "none", 
-                                        border: "none", 
-                                        fontSize: "2.4rem", 
-                                        cursor: "pointer",
-                                        color: isListening ? "#cc0000" : "inherit",
-                                        transition: "all 0.3s ease",
-                                        zIndex: 2
-                                    }}
-                                >
-                                    {isListening ? "🛑" : "🎤"}
-                                </button>
-                                {isListening && <span className="pulse-ring"></span>}
+                        <form onSubmit={handleSendMessage} className="chat-input-form">
+                            <div className="input-actions-wrapper">
+                                <label className="action-icon-label">
+                                    📷
+                                    <input 
+                                        type="file" 
+                                        hidden 
+                                        multiple 
+                                        accept="image/*" 
+                                        onClick={(e) => { e.target.value = null; }}
+                                        onChange={(e) => {
+                                            if (e.target.files.length > 0) {
+                                                setSelectedImages(prev => [...prev, ...Array.from(e.target.files)]);
+                                                toast.success(`Successfully added ${e.target.files.length} attachment(s) to template queue.`);
+                                            }
+                                        }} 
+                                    />
+                                </label>
+                                
+                                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                                    <button 
+                                        type="button" 
+                                        onClick={startVoiceRecognition} 
+                                        className="voice-toggle-btn"
+                                        style={{ color: isListening ? "#cc0000" : "inherit" }}
+                                    >
+                                        {isListening ? "🛑" : "🎤"}
+                                    </button>
+                                    {isListening && <span className="pulse-ring"></span>}
+                                </div>
                             </div>
                             
                             <input 
@@ -475,13 +465,347 @@ export const Chat = () => {
                                 onChange={handleInputChange}
                                 placeholder={chatClosed ? "Conversation ended." : "Ask about your tickets..."}
                                 disabled={chatClosed}
-                                style={{ flexGrow: 1, padding: "1rem", borderRadius: "0.5rem", border: "none", boxShadow: "none", fontSize: "1.6rem", opacity: chatClosed ? 0.6 : 1 }}
+                                className="main-chat-input"
+                                style={{ opacity: chatClosed ? 0.6 : 1 }}
                             />
-                            <button type="submit" className="btn" disabled={chatClosed}>Send</button>
+                            <button type="submit" className="btn submit-chat-btn" disabled={chatClosed}>Send</button>
                         </form>
                     </div>
                 </div>
             </div>
+
+            <style>{`
+                .section-chat {
+                    padding: 12rem 0 6rem 0;
+                    background: #0f172a;
+                    min-height: 100vh;
+                }
+
+                .chat-layout-container {
+                    padding: 0 2rem;
+                }
+
+                .chat-window {
+                    background: #1e293b;
+                    border-radius: 1rem;
+                    padding: 2rem;
+                    display: flex;
+                    flex-direction: column;
+                    height: 70vh;
+                    min-height: 480px;
+                }
+
+                .chat-messages {
+                    flex-grow: 1;
+                    overflow-y: auto;
+                    margin-bottom: 2rem;
+                    padding-right: 0.5rem;
+                }
+
+                .message-row {
+                    display: flex;
+                    width: 100%;
+                    margin-bottom: 1.5rem;
+                }
+
+                .user-row { justify-content: flex-end; }
+                .bot-row { justify-content: flex-start; }
+
+                .message-bubble {
+                    padding: 1.2rem 1.6rem;
+                    border-radius: 1rem;
+                    max-width: 75%;
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                }
+
+                .user-bubble {
+                    background: var(--btn-color, #3b82f6);
+                    color: white;
+                    border-bottom-right-radius: 0.2rem;
+                }
+
+                .bot-bubble {
+                    background: #334155;
+                    color: white;
+                    border-bottom-left-radius: 0.2rem;
+                }
+
+                .category-selection-wrapper {
+                    margin-top: 1.5rem;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                    width: 100%;
+                    width: 320px;
+                    max-width: 100%;
+                }
+
+                .accordion-group {
+                    background: #2d3748;
+                    border-radius: 0.6rem;
+                    overflow: hidden;
+                    border: 1px solid #475569;
+                }
+
+                .accordion-trigger {
+                    width: 100%;
+                    padding: 1.2rem 1.5rem;
+                    background: #1e293b;
+                    color: white;
+                    border: none;
+                    text-align: left;
+                    fontSize: 1.5rem;
+                    fontWeight: bold;
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                }
+
+                .accordion-trigger.active {
+                    background: var(--btn-color, #3b82f6);
+                    color: black;
+                }
+
+                .accordion-content {
+                    padding: 0.8rem;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.6rem;
+                    background: #1e293b;
+                }
+
+                .category-item-btn {
+                    padding: 1rem;
+                    font-size: 1.3rem;
+                    border-radius: 0.4rem;
+                    background: white;
+                    border: none;
+                    color: black;
+                    text-align: left;
+                    font-weight: 700;
+                    cursor: pointer;
+                }
+
+                .category-others-btn {
+                    width: 100%;
+                    padding: 1.2rem 1.5rem;
+                    background: var(--btn-color, #3b82f6);
+                    color: black;
+                    border: none;
+                    border-radius: 0.6rem;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    cursor: pointer;
+                }
+
+                .interactive-prompt-row {
+                    margin-top: 1.2rem;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.8rem;
+                    padding: 0.5rem;
+                }
+
+                .action-btn {
+                    padding: 0.8rem 1.4rem;
+                    border: none;
+                    border-radius: 0.4rem;
+                    font-weight: bold;
+                    font-size: 1.3rem;
+                    cursor: pointer;
+                }
+
+                .continue-btn {
+                    background: var(--btn-color, #3b82f6);
+                    color: black;
+                }
+
+                .ticket-btn {
+                    background: #475569;
+                    color: white;
+                }
+
+                .feedback-container {
+                    margin-top: 2rem;
+                    padding: 1.5rem;
+                    background: #1e293b;
+                    border-radius: 1rem;
+                    border: 2px solid var(--btn-color, #3b82f6);
+                }
+
+                .listening-indicator {
+                    display: inline-block;
+                    padding: 1rem;
+                    border-radius: 1rem;
+                    background: #cc0000;
+                    color: white;
+                    font-size: 1.4rem;
+                    font-weight: bold;
+                }
+
+                .searching-indicator {
+                    display: inline-block;
+                    padding: 1rem;
+                    border-radius: 1rem;
+                    background: #1e293b;
+                    color: #60a5fa;
+                    font-size: 1.4rem;
+                    border: 1px solid #60a5fa;
+                }
+
+                .typing-indicator {
+                    display: inline-block;
+                    padding: 1rem;
+                    border-radius: 1rem;
+                    background: #334155;
+                    color: #94a3b8;
+                    font-size: 1.4rem;
+                }
+
+                .chat-input-container {
+                    position: relative;
+                    background: #111827;
+                    padding: 1rem;
+                    border-radius: 0.5rem;
+                }
+
+                .suggestions-box {
+                    position: absolute;
+                    bottom: 100%;
+                    left: 0;
+                    width: 100%;
+                    background: #334155;
+                    border-radius: 0.5rem;
+                    margin-bottom: 0.5rem;
+                    padding: 0.5rem;
+                    z-index: 10;
+                    border: 1px solid #4b5563;
+                    max-height: 160px;
+                    overflow-y: auto;
+                }
+
+                .suggestion-item {
+                    padding: 1rem;
+                    cursor: pointer;
+                    font-size: 1.4rem;
+                    border-bottom: 1px solid #475569;
+                    color: white;
+                }
+
+                .chat-input-form {
+                    display: flex;
+                    gap: 1rem;
+                    align-items: center;
+                    width: 100%;
+                }
+
+                .input-actions-wrapper {
+                    display: flex;
+                    gap: 1rem;
+                    align-items: center;
+                }
+
+                .action-icon-label {
+                    cursor: pointer;
+                    font-size: 2.4rem;
+                    user-select: none;
+                }
+
+                .voice-toggle-btn {
+                    background: none;
+                    border: none;
+                    font-size: 2.4rem;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    z-index: 2;
+                }
+
+                .main-chat-input {
+                    flex-grow: 1;
+                    padding: 1.2rem;
+                    border-radius: 0.5rem;
+                    border: 1px solid #4b5563;
+                    background: #1f2937;
+                    color: white;
+                    font-size: 1.6rem;
+                    outline: none;
+                    min-width: 50px;
+                }
+
+                .submit-chat-btn {
+                    padding: 1.1rem 2rem;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                }
+
+                /* 📱 MOBILE SCREEN OPTIMIZATION BREAKPOINTS (100% RESPONSIVE) */
+                @media (max-width: 768px) {
+                    .section-chat {
+                        padding: 8rem 0 3rem 0;
+                    }
+
+                    .chat-layout-container {
+                        padding: 0 1rem;
+                    }
+
+                    .chat-window {
+                        padding: 1rem;
+                        height: 78vh;
+                    }
+
+                    .message-bubble {
+                        max-width: 90%; /* Expand width slightly to read lines more fluidly */
+                        font-size: 1.4rem;
+                    }
+
+                    .category-selection-wrapper {
+                        width: 100%; /* Spans the full box bubble layout width */
+                    }
+
+                    .chat-input-form {
+                        gap: 0.6rem;
+                    }
+
+                    .main-chat-input {
+                        font-size: 1.4rem;
+                        padding: 1rem;
+                    }
+
+                    .submit-chat-btn {
+                        padding: 1rem 1.4rem;
+                        font-size: 1.4rem;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .chat-input-form {
+                        flex-wrap: wrap; /* Wraps components systematically if row is too tight */
+                    }
+
+                    .input-actions-wrapper {
+                        width: 100%;
+                        justify-content: flex-start;
+                        margin-bottom: 0.4rem;
+                        padding-left: 0.5rem;
+                        gap: 1.5rem;
+                    }
+
+                    .main-chat-input {
+                        width: 65%;
+                    }
+
+                    .submit-chat-btn {
+                        width: 25%;
+                        flex-grow: 1;
+                        text-align: center;
+                    }
+                    
+                    .interactive-prompt-row .action-btn {
+                        width: 100%; /* Stacks troubleshooting buttons cleanly */
+                    }
+                }
+            `}</style>
         </section>
     );
 };
