@@ -42,6 +42,15 @@ export const Chat = () => {
                     </a>
                 );
             } else if (part.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)) {
+                // ✅ FIXED: Deep multi-token verification stops file path strings from generating fake call buttons
+                const isFilePath = part.toLowerCase().match(/\.(png|jpg|jpeg|gif|webp)$/) || 
+                                   text.toLowerCase().includes("uploads/" + part.toLowerCase()) ||
+                                   text.toLowerCase().includes("uploads/ " + part.toLowerCase());
+
+                if (isFilePath) {
+                    return part; // Safely outputs raw text layout pathing
+                }
+
                 const cleanPhone = part.replace(/[-.\s()]/g, "");
                 return (
                     <a key={i} href={`tel:${cleanPhone}`} style={{ color: "var(--btn-color)", textDecoration: "underline", wordBreak: "break-all", fontWeight: "bold" }}>
@@ -122,7 +131,7 @@ export const Chat = () => {
             "Feature Request": [...coreTemplateBlocks, "Feature Title", "Feature Description", "Business Purpose"],
             "Vehicle Maintenance": [...coreTemplateBlocks, "Vehicle Number", "Vehicle Type", "Issue Type", "Location"],
             "Traffic & Logistics": [...coreTemplateBlocks, "Shipment ID", "Location/Affected Area", "Issue Type"],
-            "Food": [...coreTemplateBlocks, "Food Platform Name", "Order ID", "Food Item Name", "Restaurant Name", "Photos (Min 2 REQUIRED)"],
+            "Food": [...coreTemplateBlocks, "Order ID", "Food Item Name", "Restaurant Name", "Photos (Min 2 REQUIRED)"],
             "Others": [...coreTemplateBlocks, "Detailed Parameter Description Log"],
             "default": [...coreTemplateBlocks, "Locality/Location", "Issue Description", "Date & Time"]
         };
@@ -206,7 +215,11 @@ export const Chat = () => {
 
                         if (uploadRes.ok) {
                             const uploadData = await uploadRes.json();
-                            return uploadData.filePath.startsWith('uploads/') ? uploadData.filePath : `uploads/${uploadData.filePath}`;
+                            let rawPath = uploadData.filePath || uploadData.path;
+                            if (!rawPath && uploadData.url) {
+                                return uploadData.url;
+                            }
+                            return rawPath.startsWith('uploads/') ? rawPath : `uploads/${rawPath}`;
                         }
                     } catch (err) {
                         console.error("Image upload failed:", err);
@@ -221,7 +234,15 @@ export const Chat = () => {
                 queryWithImages += ` (Attached Images: ${uploadedUrls.join(", ")})`;
             }
 
-            const formattedImages = uploadedUrls.map(url => url.startsWith('/') ? `${API_URL}${url}` : `${API_URL}/${url}`);
+            const formattedImages = uploadedUrls.map(url => {
+                if (url.startsWith('http')) return url;
+                
+                let cleanUrl = url.replace(/\\/g, '/').replace('uploads/', '').replace('images/', '');
+                if (cleanUrl.startsWith('/')) cleanUrl = cleanUrl.substring(1);
+                
+                cleanUrl = cleanUrl.replace(/\/\/+/g, '/');
+                return `${API_URL}/uploads/${cleanUrl}`;
+            });
 
             const userMessage = { 
                 role: "user", 
@@ -300,6 +321,10 @@ export const Chat = () => {
         } catch (error) { toast.error("Failed to re-route category"); }
     };
 
+    const removeSelectedImage = (indexToRemove) => {
+        setSelectedImages(prev => prev.filter((_, idx) => idx !== indexToRemove));
+    };
+
     if (isLoading) return <h1 className="main-heading">Loading Assistant...</h1>;
 
     return (
@@ -312,7 +337,7 @@ export const Chat = () => {
                             <div key={index} className={`message-row ${chat.role === "user" ? "user-row" : "bot-row"}`}>
                                 <div className={`message-bubble ${chat.role === "user" ? "user-bubble" : "bot-bubble"}`}>
                                     {chat.images && chat.images.map((imgUrl, idx) => (
-                                        <img key={idx} src={imgUrl} alt="Attachment" style={{ maxWidth: "100%", borderRadius: "0.5rem", marginBottom: "0.5rem", display: "block" }} />
+                                        <img key={idx} src={imgUrl} alt="Attachment" style={{ maxWidth: "240px", width: "100%", height: "auto", borderRadius: "0.5rem", marginBottom: "0.8rem", display: "block", border: "1px solid #475569" }} />
                                     ))}
                                     <p style={{ margin: 0, fontSize: "1.6rem" }}>{renderContentWithLinks(chat.content)}</p>
                                     
@@ -420,6 +445,17 @@ export const Chat = () => {
                     </div>
                     
                     <div className="chat-input-container">
+                        {selectedImages.length > 0 && (
+                            <div className="attachment-preview-bar">
+                                {selectedImages.map((file, idx) => (
+                                    <div key={idx} className="preview-thumbnail-wrapper">
+                                        <img src={URL.createObjectURL(file)} alt="Preview thumbnail" className="thumbnail-img" />
+                                        <button type="button" onClick={() => removeSelectedImage(idx)} className="remove-thumbnail-btn">×</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         {suggestions.length > 0 && (
                             <div className="suggestions-box">
                                 {suggestions.map((s, i) => (
@@ -555,8 +591,8 @@ export const Chat = () => {
                     color: white;
                     border: none;
                     text-align: left;
-                    fontSize: 1.5rem;
-                    fontWeight: bold;
+                    font-size: 1.5rem;
+                    font-weight: bold;
                     display: flex;
                     align-items: center;
                     cursor: pointer;
@@ -666,8 +702,63 @@ export const Chat = () => {
                 .chat-input-container {
                     position: relative;
                     background: #111827;
-                    padding: 1rem;
+                    padding: 1.5rem;
                     border-radius: 0.5rem;
+                    border: 1px solid #334155;
+                    margin-top: 1rem;
+                }
+
+                .attachment-preview-bar {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1.5rem;
+                    padding: 1rem;
+                    background: #1e293b;
+                    border-radius: 0.6rem;
+                    margin-bottom: 1.5rem;
+                    border: 2px dashed #3b82f6;
+                }
+
+                .preview-thumbnail-wrapper {
+                    position: relative;
+                    width: 70px;
+                    height: 70px;
+                    border-radius: 0.6rem;
+                    overflow: visible;
+                    border: 2px solid #64748b;
+                    background: #0f172a;
+                }
+
+                .thumbnail-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: 0.4rem;
+                }
+
+                .remove-thumbnail-btn {
+                    position: absolute;
+                    top: -8px;
+                    right: -8px;
+                    background: #ef4444 !important;
+                    color: white !important;
+                    border: 2px solid #ffffff !important;
+                    border-radius: 50% !important;
+                    width: 22px !important;
+                    height: 22px !important;
+                    font-size: 1.4rem !important;
+                    font-weight: bold !important;
+                    cursor: pointer !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+                    z-index: 5;
+                }
+
+                .remove-thumbnail-btn:hover {
+                    background: #dc2626 !important;
+                    transform: scale(1.1);
                 }
 
                 .suggestions-box {
@@ -739,7 +830,6 @@ export const Chat = () => {
                     font-weight: bold;
                 }
 
-                /* 📱 MOBILE SCREEN OPTIMIZATION BREAKPOINTS (100% RESPONSIVE) */
                 @media (max-width: 768px) {
                     .section-chat {
                         padding: 8rem 0 3rem 0;
@@ -755,12 +845,12 @@ export const Chat = () => {
                     }
 
                     .message-bubble {
-                        max-width: 90%; /* Expand width slightly to read lines more fluidly */
+                        max-width: 90%;
                         font-size: 1.4rem;
                     }
 
                     .category-selection-wrapper {
-                        width: 100%; /* Spans the full box bubble layout width */
+                        width: 100%;
                     }
 
                     .chat-input-form {
@@ -780,7 +870,7 @@ export const Chat = () => {
 
                 @media (max-width: 480px) {
                     .chat-input-form {
-                        flex-wrap: wrap; /* Wraps components systematically if row is too tight */
+                        flex-wrap: wrap;
                     }
 
                     .input-actions-wrapper {
@@ -802,7 +892,7 @@ export const Chat = () => {
                     }
                     
                     .interactive-prompt-row .action-btn {
-                        width: 100%; /* Stacks troubleshooting buttons cleanly */
+                        width: 100%;
                     }
                 }
             `}</style>

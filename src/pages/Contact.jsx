@@ -15,7 +15,7 @@ export const Contact = () => {
 
   // Get user data from AuthContext
   const [contactContent, setContactContent] = useState({
-    contactImage: "/images/contact.png", // Default image
+    contactImage: "", 
     mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d224346.48167620343!2d77.06889926628777!3d28.52755440978482!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce3c6c1f8b7df%3A0x7c5f5d7b5d8c5f6d!2sNew%20Delhi%2C%20Delhi!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin" // Default map
   });
 
@@ -125,7 +125,14 @@ export const Contact = () => {
               {/* CONTACT IMAGE */}
               <div className="contact-image" style={{ order: 2 }}> {/* Image on right for desktop, below form for mobile */}
                 <img
-                  src={contactContent.contactImage}
+                  /* ✅ FIXED: If the database value is just a static string path, it reads locally from your Frontend public folder.
+                     If it's an absolute URL or uses a timestamped file name from your upload system, it correctly calls the API_URL backend directory!
+                  */
+                  src={
+                    contactContent.contactImage && (contactContent.contactImage.startsWith("http") || contactContent.contactImage.includes("178"))
+                      ? `${API_URL}${contactContent.contactImage}`
+                      : "/images/contact.png"
+                  }
                   alt="A girl is trying to connect"
                   style={{ width: "100%", height: "auto", display: "block" }}
                 />
@@ -202,8 +209,8 @@ export const Contact = () => {
                         border: errors.category ? "3px solid #cc0000" : "1px solid #475569", boxShadow: errors.category ? "0 0 8px rgba(204, 0, 0, 0.6)" : "none", backgroundColor: "white", color: "black"
                       }}
                     >
-                      <option value="" disabled>Select a Category</option> {/* Placeholder */}
-                      <option value="General">General Inquiry</option> {/* Now a selectable option */}
+                      <option value="" disabled>Select a Category</option>
+                      <option value="General">General Inquiry</option>
                       <option value="Technical">Technical Support</option>
                       <option value="Billing">Billing & Payments</option>
                       <option value="Login & Authentication">Login & Authentication</option>
@@ -255,7 +262,7 @@ export const Contact = () => {
         <section className="section-map">
           <div className="container">
             <iframe 
-              src={contactContent.mapEmbedUrl}
+              src={contactContent.mapEmbedUrl || "https://maps.google.com/maps?q=delhi&t=&z=13&ie=UTF8&iwloc=&output=embed"}
               width="100%"
               height="450"
               style={{ border: 0 }}
