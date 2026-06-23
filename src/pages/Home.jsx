@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../store/auth"; // Ensure this path is correct
 
-const API_URL = import.meta.env.VITE_API_URL;
+// 🚀 Pull raw environment variable safely
+const RAW_API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
+
+// 🧹 AUTO-CLEAN: Removes any accidental trailing slashes to prevent the double slash (//api) bug
+const API_URL = RAW_API_URL.endsWith('/') ? RAW_API_URL.slice(0, -1) : RAW_API_URL;
 
 export const Home = () => {
   const { authorizationToken } = useAuth();
@@ -21,8 +25,9 @@ export const Home = () => {
     ctaImage: "/images/design.png" // Default image for CTA section
   });
 
-  useEffect(() => { // Public endpoint, no auth header needed for viewing
-    fetch(`${API_URL}/api/home`) // Public endpoint, no auth header needed for viewing
+  useEffect(() => { 
+    // ✅ Uses the auto-cleaned single-slash API_URL route target cleanly
+    fetch(`${API_URL}/api/home`) 
       .then(res => res.json())
       .then(data => {
         // If data is returned correctly and is not an error message
@@ -31,7 +36,7 @@ export const Home = () => {
         }
       })
       .catch(err => console.log("Fetch error:", err));
-  }, []); // Removed authorizationToken from dependency array as it's not needed for public fetch
+  }, []); 
 
   return (
     <>
@@ -66,8 +71,8 @@ export const Home = () => {
             {/* HOME IMAGE */}
             <div className="SmartServe">
               <img
-                src={content.homeImage} // Use image from content state
-                alt="Working Together" // Use image from content state
+                src={content.homeImage} 
+                alt="Working Together" 
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
             </div>
@@ -105,7 +110,6 @@ export const Home = () => {
         {/* CTA SECTION */}
         <section className="section-hero">
           <div className="container grid grid-two-cols" style={{ textAlign: "left", alignItems: "flex-start" }}>
-            {/* Text content for CTA section - order 1 for desktop, top for mobile */}
             <div className="SmartServe" style={{ order: 1 }}>
               <p>{content.ctaSubtitle}</p>
               <h1>{content.ctaTitle}</h1>
@@ -120,11 +124,10 @@ export const Home = () => {
               </div>
             </div>
 
-            {/* Image for CTA section - order 2 for desktop, bottom for mobile */}
             <div className="SmartServe" style={{ order: 2 }}>
               <img
                 src={content.ctaImage}
-                alt="Working Together" // Use image from content state
+                alt="Working Together" 
                 style={{ maxWidth: "100%", height: "auto", display: "block" }}
               />
             </div>
