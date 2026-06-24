@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import { toast } from "react-toastify";
@@ -16,8 +16,19 @@ export const Register = () => {
   const [otp, setOtp] = useState(""); // 🔑 Holds the 6-digit OTP string
   const [step, setStep] = useState(1); // ⏳ Step 1: Account Info | Step 2: OTP Verification Box
   const [errors, setErrors] = useState({});
+  const [cooldown, setCooldown] = useState(0); // ⏱️ Tracks seconds remaining for resend block
+  const [isSubmitting, setIsSubmitting] = useState(false); // 🔒 Prevents double-clicking spam loops
   const navigate = useNavigate();
   const { storeTokenInLS } = useAuth();
+
+  // ⏱️ TIMER EFFECT: Counts down whenever the cooldown hook goes above 0 seconds
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setTimeout(() => setCooldown((prev) => prev - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   // HANDLE INPUT
   const handleInput = (e) => {
@@ -36,7 +47,8 @@ export const Register = () => {
 
   // HANDLE STEP 1 SUBMIT (Send OTP)
   const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (isSubmitting) return; // Halt if an active network connection is currently live
 
     const newErrors = {};
     ["username", "email", "phone", "password"].forEach((field) => {
@@ -49,11 +61,12 @@ export const Register = () => {
     }
 
     try {
+      setIsSubmitting(true);
       const registerUser = {
         username: user.username.trim(),
         email: user.email.trim().toLowerCase(),
         phone: user.phone.toString().trim(),
-        password: user.password, // Keep intact for validation checking
+        password: user.password, 
       };
 
       const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -67,22 +80,33 @@ export const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.info(data.message || "Verification code sent to your email.");
+        toast.success("Account initiated! Please check your email inbox for your security OTP code.");
         setStep(2); // 🚀 Shift view straight to the OTP code verification screen
+        setCooldown(30); // ⏳ Lock resend button layout for 30 seconds
       } else {
         toast.error(data.extraDetails ? data.extraDetails : data.message);
       }
     } catch (error) {
       console.error("register", error);
       toast.error("An error occurred during registration initiation");
+    } finally {
+      setIsSubmitting(false); // Reset lock state
     }
+  };
+
+  // ✅ RESEND OTP ACTION INTERCEPTOR
+  const handleResendOtp = async () => {
+    if (cooldown > 0) return; 
+    toast.info("Requesting a fresh verification code token...");
+    await handleRegisterSubmit(null);
   };
 
   // HANDLE STEP 2 SUBMIT (Verify OTP & Complete Sign Up)
   const handleOtpVerifySubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    const cleanOtp = otp.replace(/\s+/g, "").trim(); // Removes any rogue spaces added by layout fonts
+    const cleanOtp = otp.replace(/\s+/g, "").trim(); 
 
     if (!cleanOtp || cleanOtp.length !== 6) {
       toast.error("Please enter a valid 6-digit verification code.");
@@ -90,7 +114,7 @@ export const Register = () => {
     }
 
     try {
-      // ✅ Payload explicitly formats structure for backend Zod schemas
+      setIsSubmitting(true);
       const verifyPayload = {
         username: user.username.trim(),
         email: user.email.trim().toLowerCase(),
@@ -122,12 +146,13 @@ export const Register = () => {
         setOtp("");
         navigate("/chat");
       } else {
-        // Displays exact validation error messaging from your backend middleware
         toast.error(data.extraDetails ? data.extraDetails : data.message);
       }
     } catch (error) {
       console.error("otp-verification-error", error);
       toast.error("An error occurred during OTP verification.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -227,8 +252,8 @@ export const Register = () => {
                       />
                     </div>
 
-                    <button type="submit" className="btn btn-submit">
-                      Send Verification Code
+                    <button type="submit" className="btn btn-submit" disabled={isSubmitting}>
+                      {isSubmitting ? "Sending Code Token..." : "Send Verification Code"}
                     </button>
 
                     <div style={{ marginTop: "1.5rem" }}>
@@ -243,9 +268,12 @@ export const Register = () => {
                 ) : (
                   /* STEP 2 FORM: ENTER OTP CODE */
                   <form onSubmit={handleOtpVerifySubmit} noValidate>
-                    <div style={{ marginBottom: "1.5rem" }}>
-                      <p style={{ color: "#cbd5e1", fontSize: "1.1rem" }}>
-                        An email containing a 6-digit verification security key was sent to <strong>{user.email}</strong>.
+                    <div style={{ marginBottom: "2rem", borderLeft: "4px solid var(--btn-color, #3b82f6)", paddingLeft: "1.2rem" }}>
+                      <p style={{ color: "#ffffff", fontSize: "1.6rem", fontWeight: "bold", margin: "0 0 0.5rem 0" }}>
+                        📩 Check Your Email Inbox!
+                      </p>
+                      <p style={{ color: "#cbd5e1", fontSize: "1.3rem", margin: 0, lineHeight: "1.5" }}>
+                        A 6-digit validation OTP security key has been dispatched to <strong>{user.email}</strong>. Please check your inbox or spam folders.
                       </p>
                     </div>
 
@@ -271,14 +299,41 @@ export const Register = () => {
                       />
                     </div>
 
-                    <button type="submit" className="btn btn-submit">
-                      Verify & Register
+                    {/* 🔄 RESEND COUNTER TIMER FRAMEWORK */}
+                    <div style={{ marginTop: "1rem", marginBottom: "2rem", textAlign: "right", fontSize: "1.4rem" }}>
+                      {cooldown > 0 ? (
+                        <span style={{ color: "#94a3b8", fontStyle: "italic" }}>
+                          Resend verification code in <strong>{cooldown}s</strong>
+                        </span>
+                      ) : (
+                        <button 
+                          type="button" 
+                          onClick={handleResendOtp}
+                          disabled={isSubmitting}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "var(--btn-color, #3b82f6)",
+                            textDecoration: "underline",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            fontSize: "1.4rem"
+                          }}
+                        >
+                          🔄 Didn't receive code? Resend OTP
+                        </button>
+                      )}
+                    </div>
+
+                    <button type="submit" className="btn btn-submit" disabled={isSubmitting}>
+                      {isSubmitting ? "Verifying..." : "Verify & Register"}
                     </button>
 
                     <button
                       type="button"
                       className="btn"
                       onClick={() => setStep(1)}
+                      disabled={isSubmitting}
                       style={{
                         marginTop: "1rem",
                         width: "100%",

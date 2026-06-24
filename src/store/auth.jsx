@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-// 🚀 Dynamic URL parsing linking frontend builds cleanly to your live Render server backend
-const API_URL = import.meta.env.VITE_API_URL || "https://ai-powered-helpdesk.onrender.com";
+// ✅ FIXED: Defaults to your active localhost:5000 server if .env is missing
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const AuthContext = createContext();
 
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   const LogoutUser = () => {
     setToken("");
     localStorage.removeItem("token");
-    setUser("");
+    setUser(null);
   };
 
   // JWT AUTHENTICATION - fetch user data from backend
@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        // Your backend returns { userData: { ... } }
         setUser(data.userData);
         setIsLoading(false);
       } else {
@@ -70,9 +69,19 @@ export const AuthProvider = ({ children }) => {
       });
       if (response.ok) {
         const data = await response.json();
-        // Fallback in case backend returns array directly or inside .msg
-        const servicesData = Array.isArray(data) ? data : data.msg;
-        setServices(servicesData || []);
+        
+        // ✅ FIXED: Safely unpacks standard raw arrays, data.data, or data.msg structures 
+        let servicesData = [];
+        if (Array.isArray(data)) {
+          servicesData = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          servicesData = data.data;
+        } else if (data.msg && Array.isArray(data.msg)) {
+          servicesData = data.msg;
+        }
+
+        console.log("Verified Local Services Payload:", servicesData);
+        setServices(servicesData);
       }
     } catch (error) {
       console.error('Error fetching services:', error);
