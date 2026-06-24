@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 // ✅ FIXED: Defaults to your active localhost:5000 server if .env is missing
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const AuthContext = createContext();
 
@@ -123,3 +123,4 @@ export const useAuth = () => {
   }
   return authContextValue;
 };
+

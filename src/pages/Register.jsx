@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { useAuth } from "../store/auth";
+import { useAuth, API_URL } from "../store/auth"; // ✅ Clean central API_URL imported from auth store
 import { toast } from "react-toastify";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export const Register = () => {
   const [user, setUser] = useState({
@@ -49,11 +47,12 @@ export const Register = () => {
     }
 
     try {
+      // ✅ FIXED: phone sent as a trimmed string to pass Zod schema verification
       const registerUser = {
         username: user.username.trim(),
         email: user.email.trim().toLowerCase(),
-        phone: user.phone.toString().trim(),
-        password: user.password, // Keep intact for validation checking
+        phone: user.phone.toString().trim(), 
+        password: user.password, 
       };
 
       const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -90,7 +89,7 @@ export const Register = () => {
     }
 
     try {
-      // ✅ Payload explicitly formats structure for backend Zod schemas
+      // ✅ FIXED: phone sent cleanly as a string format here as well
       const verifyPayload = {
         username: user.username.trim(),
         email: user.email.trim().toLowerCase(),
@@ -122,7 +121,6 @@ export const Register = () => {
         setOtp("");
         navigate("/chat");
       } else {
-        // Displays exact validation error messaging from your backend middleware
         toast.error(data.extraDetails ? data.extraDetails : data.message);
       }
     } catch (error) {
